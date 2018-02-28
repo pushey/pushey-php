@@ -1,0 +1,37 @@
+{
+    "name": "pushey/pushey-php",
+    "description" : "Library for interacting with the Pushey REST API",
+    "keywords": ["pushey", "rest", "notifications", "push", "trigger", "events"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pushey",
+            "homepage": "https://pushey.com"
+        }
+    ],
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.0",
+        "phpunit/phpunit": "^5.7 || ^6.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pushey\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pushey\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
