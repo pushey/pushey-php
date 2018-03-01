@@ -26,7 +26,7 @@ abstract class Message
      */
     public function recipients($recipients)
     {
-        $this->recipients = is_array($recipients) ? $recipients : [$recipients];
+        $this->recipients = (array) $recipients;
 
         return $this;
     }
@@ -42,5 +42,18 @@ abstract class Message
         $this->content = $content;
 
         return $this;
+    }
+
+    /**
+     * Get an array representation of the message.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'text' => $this->content,
+            'recipients' => $this->recipients,
+        ];
     }
 }

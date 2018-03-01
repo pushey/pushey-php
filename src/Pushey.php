@@ -2,9 +2,13 @@
 
 namespace Pushey;
 
-use GuzzleHttp\Client as HttpClient;
 use Pushey\Messages\Message;
 use Pushey\Messages\SimpleMessage;
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\ClientInterface as HttpClientInterface;
 
 class Pushey
 {
@@ -18,7 +22,7 @@ class Pushey
     /**
      * The HTTP client instance.
      *
-     * @var \GuzzleHttp\Client
+     * @var \GuzzleHttp\ClientInterface
      */
     protected $http;
 
@@ -35,10 +39,14 @@ class Pushey
      * @param  string  $token
      * @return void
      */
-    public function __construct($token)
+    public function __construct($token, HttpClientInterface $http = null)
     {
-        $this->http = new HttpClient;
+        if (is_null($http)) {
+            $http = new HttpClient;
+        }
+
         $this->token = $token;
+        $this->http = $http;
     }
 
     /**
@@ -59,15 +67,25 @@ class Pushey
      * @param  array  $recipients
      * @return bool
      */
-    public function send($message, $recipients = [])
+    public function send($message, array $recipients = [])
     {
-        if (! $message instanceof Message) {
+        if (is_string($message)) {
             $message = (new SimpleMessage)
                             ->content($message)
                             ->recipients($recipients);
         }
 
-        $this->http->post(Pushey::API_URL, $this->buildJsonPayload($message));
+        // try {
+            $response = $this->http->post(Pushey::API_URL, $this->buildJsonPayload($message));
+        // } catch (ClientException $exception) {
+        //     return false;
+        // } catch (ServerException $exception) {
+        //     return false;
+        // } catch (TransferException $exception) {
+        //     return false;
+        // }
+
+        return true;
     }
 
     /**
@@ -83,10 +101,7 @@ class Pushey
         ]);
 
         return [
-            'json' => array_merge([
-                'content' => $message->content,
-                'recipients' => $message->recipients,
-            ], $default),
+            'json' => array_merge($message->toArray(), $default),
         ];
     }
 }
