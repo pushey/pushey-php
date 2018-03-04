@@ -15,7 +15,7 @@ class ClientTest extends TestCase
 
         $http->shouldReceive('post')
             ->once()
-            ->andReturn(new Response(201));
+            ->andReturn(new Response(404));
 
         $sent = $pushey->send('test', ['test@example.org']);
 

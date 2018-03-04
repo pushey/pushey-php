@@ -8,6 +8,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TransferException;
+use Pushey\Exceptions\InvalidCredentialsException;
 use GuzzleHttp\ClientInterface as HttpClientInterface;
 
 class Pushey
@@ -65,6 +66,7 @@ class Pushey
      *
      * @param  mixed  $message
      * @param  array  $recipients
+     * @throws \Pushey\Exceptions\InvalidCredentialsException
      * @return bool
      */
     public function send($message, array $recipients = [])
@@ -75,15 +77,19 @@ class Pushey
                             ->recipients($recipients);
         }
 
-        // try {
+        try {
             $response = $this->http->post(Pushey::API_URL, $this->buildJsonPayload($message));
-        // } catch (ClientException $exception) {
-        //     return false;
-        // } catch (ServerException $exception) {
-        //     return false;
-        // } catch (TransferException $exception) {
-        //     return false;
-        // }
+        } catch (ClientException $exception) {
+            if ($exception->getResponse()->getStatusCode() === 404) {
+                throw new InvalidCredentialsException('The credentials provided for the request are invalid.');
+            }
+
+            return false;
+        } catch (ServerException $exception) {
+            return false;
+        } catch (TransferException $exception) {
+            return false;
+        }
 
         return true;
     }
